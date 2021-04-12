@@ -1,10 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, status
-from datetime import datetime
+from django.utils.timezone import now
 
 from .serializers import *
-from .permissions import *
+from custom_user.permissions import *
 
 
 class CreateApplicationView(APIView):
@@ -29,9 +29,9 @@ class GetApplicationReadyView(APIView):
 
 
 class CloseApplicationReadyView(APIView):
-    permission_classes = [IsOwner]
+    permission_classes = [IsAuthenticated, IsOwner]
 
-    def put(self, request):
+    def post(self, request):
         try:
             a = Application.objects.get(owner=request.user)
             r = a.ready
@@ -44,7 +44,7 @@ class CloseApplicationReadyView(APIView):
             return Response('KeyError', status=status.HTTP_400_BAD_REQUEST)
         if r.status:
             r.status = False
-            r.closed_date = datetime.now()
+            r.closed_date = now()
             r.save()
         else:
             return Response('Заявка уже закрыта', status=status.HTTP_200_OK)
@@ -53,17 +53,22 @@ class CloseApplicationReadyView(APIView):
 
 
 class CheckApplicationView(APIView):
-    permission_classes = [IsAdmin]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def post(self, request, app_pk):
+        d = {
+            'accepted': CheckStatus.ACCEPTED,
+            'rejected': CheckStatus.REJECTED,
+            'revision': CheckStatus.REVISION,
+        }
+
         try:
             a = Application.objects.get(id=app_pk)
             r = a.ready
             if r.status:
                 return Response('Невозможно оценить открытую заявку')
-            c = CheckStatus.objects.create(status=request.data['status'],
-                                           check_date=datetime.now(),
-                                           application=a)
+            s = d.get(request.data['status'])
+
         except Application.DoesNotExist:
             return Response('Application does not exist', status=status.HTTP_400_BAD_REQUEST)
         except ReadyStatus.DoesNotExist:
@@ -71,14 +76,21 @@ class CheckApplicationView(APIView):
         except KeyError:
             return Response('KeyError', status=status.HTTP_400_BAD_REQUEST)
 
-        if c.status is 'rejected':
+        if s is None:
+            return Response('Add correct status', status=status.HTTP_400_BAD_REQUEST)
+
+        c = CheckStatus.objects.create(status=s,
+                                       check_date=now(),
+                                       application=a,
+                                       judge=request.user)
+        if c.status == 'revision':
             r.status = True
             r.save()
         serializer = ApplicationSerializer(a, context={'request': request})
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
 
-class GetClosedApplicationsView(APIView):
-    permission_classes = [IsAdmin]
+class GetClosedApplicationsView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = ApplicationSerializer
     queryset = Application.objects.filter(ready__status=False)

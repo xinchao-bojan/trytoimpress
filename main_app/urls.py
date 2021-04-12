@@ -8,5 +8,6 @@ urlpatterns = [
     path('get/<int:app_pk>/', GetApplicationReadyView.as_view()),
     path('close/', CloseApplicationReadyView.as_view()),
     path('check/<int:app_pk>/', CheckApplicationView.as_view()),
-    path('get/closed/', CheckApplicationView.as_view()),
+    path('get/closed/', GetClosedApplicationsView.as_view()),
+
 ]

@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import *
+from custom_user.serializers import CustomUserSerializer
 
 
 class ReadySerializer(serializers.ModelSerializer):
@@ -18,7 +19,9 @@ class CheckSerializer(serializers.ModelSerializer):
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = '__all__'
+        fields = ['id', 'owner', 'start_date', 'ready', 'checkstatus_set']
 
     ready = ReadySerializer()
-    check = CheckSerializer()
+    owner = CustomUserSerializer()
+    checkstatus_set = CheckSerializer(many=True)
+
