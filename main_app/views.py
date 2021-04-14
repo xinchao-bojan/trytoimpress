@@ -83,7 +83,7 @@ class CheckApplicationView(APIView):
                                        check_date=now(),
                                        application=a,
                                        judge=request.user)
-        if c.status == 'revision':
+        if c.status == CheckStatus.REVISION:
             r.status = True
             r.save()
         serializer = ApplicationSerializer(a, context={'request': request})
