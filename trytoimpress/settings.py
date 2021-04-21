@@ -22,8 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = config('SECRET_KEY')
-SECRET_KEY = 'django-insecure-c!-w8)cngin%!xq1o0y@mfhgs@z2%suw-#24)=t&obzr1$26&n'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -142,12 +141,10 @@ SOCIAL_AUTH_AUTH0_SCOPE = [
 ]
 
 SOCIAL_AUTH_TRAILING_SLASH = False  # Remove trailing slash from routes
-# SOCIAL_AUTH_AUTH0_DOMAIN = config('SOCIAL_AUTH_AUTH0_DOMAIN')
-# SOCIAL_AUTH_AUTH0_KEY = config('SOCIAL_AUTH_AUTH0_KEY')
-# SOCIAL_AUTH_AUTH0_SECRET = config('SOCIAL_AUTH_AUTH0_SECRET')
-SOCIAL_AUTH_AUTH0_DOMAIN = 'suroegin503.eu.auth0.com'
-SOCIAL_AUTH_AUTH0_KEY = '5UZHFN9d7E8BDTd2JGMkP9QOrnRSRjWj'
-SOCIAL_AUTH_AUTH0_SECRET = '3xKOVXb79cOBCT8fpZ62bk-lq_TjWlq5I0gWkk2myJQ2J57brLnuVBR06OAmiQAU'
+SOCIAL_AUTH_AUTH0_DOMAIN = config('SOCIAL_AUTH_AUTH0_DOMAIN')
+SOCIAL_AUTH_AUTH0_KEY = config('SOCIAL_AUTH_AUTH0_KEY')
+SOCIAL_AUTH_AUTH0_SECRET = config('SOCIAL_AUTH_AUTH0_SECRET')
+
 
 CORS_ORIGIN_ALLOW_ALL = True  # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
 CORS_ALLOW_CREDENTIALS = True
