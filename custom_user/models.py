@@ -24,9 +24,11 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser):
     email = models.EmailField(verbose_name='Адрес электронной почты', max_length=63, unique=True)
+    first_name = models.CharField(max_length=127, verbose_name='Имя')
+    last_name = models.CharField(max_length=127, verbose_name='Фамилия')
+    position = models.ForeignKey('Position', on_delete=models.SET_NULL, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
-    is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
@@ -42,3 +44,7 @@ class CustomUser(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+
+class Position(models.Model):
+    position = models.CharField(max_length=255, verbose_name='Должность')

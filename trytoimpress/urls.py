@@ -20,9 +20,7 @@ from django.conf.urls import url
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('main_app.urls')),
+    path('', include(('auth0login.urls'))),
+
 ]
 
-urlpatterns += [
-    url(r'^auth/', include('djoser.urls')),
-    url(r'^auth/', include('djoser.urls.jwt')),
-]
