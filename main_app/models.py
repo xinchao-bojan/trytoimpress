@@ -38,7 +38,7 @@ class CheckStatus(models.Model):
 
 
 class Application(models.Model):
-    owner = models.OneToOneField(User, verbose_name='Владелец заявки', on_delete=models.CASCADE)
+    owner = models.OneToOneField(User, verbose_name='Владелец заявки', on_delete=models.CASCADE, unique=True)
     start_date = models.DateField(auto_now_add=True, verbose_name='Старт подачи заявки')
     ready = models.OneToOneField(ReadyStatus, verbose_name='Статус заполнения заявки', on_delete=models.CASCADE)
 
