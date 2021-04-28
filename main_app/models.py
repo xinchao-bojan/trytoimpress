@@ -7,6 +7,7 @@ User = get_user_model()
 class ReadyStatus(models.Model):
     status = models.BooleanField(default=True)
     closed_date = models.DateTimeField(verbose_name='Дата закрытия заявки', blank=True, null=True)
+    application = models.OneToOneField('Application', verbose_name='Статус заполнения заявки', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         if self.status:
@@ -40,7 +41,6 @@ class CheckStatus(models.Model):
 class Application(models.Model):
     owner = models.OneToOneField(User, verbose_name='Владелец заявки', on_delete=models.CASCADE, unique=True)
     start_date = models.DateField(auto_now_add=True, verbose_name='Старт подачи заявки')
-    ready = models.OneToOneField(ReadyStatus, verbose_name='Статус заполнения заявки', on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.owner.email
+        return self.owner.name

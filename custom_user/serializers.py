@@ -14,4 +14,4 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = CustomUser
         exclude = ['password']
 
-    position = PositionSerializer()
+    position = PositionSerializer(many=True)

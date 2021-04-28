@@ -8,14 +8,16 @@ from custom_user.permissions import *
 
 
 class CreateApplicationView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        r = ReadyStatus.objects.create()
-        a = Application.objects.create(owner=request.user,
-                                       ready=r)
-        serializer = ApplicationSerializer(a, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        try:
+            Application.objects.get(owner=request.user)
+            return Response('already exist', status=status.HTTP_400_BAD_REQUEST)
+        except Application.DoesNotExist:
+            a = Application.objects.create(owner=request.user)
+            ReadyStatus.objects.create(application=a)
+            serializer = ApplicationSerializer(a, context={'request': request})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class GetApplicationReadyView(APIView):
@@ -25,7 +27,8 @@ class GetApplicationReadyView(APIView):
             a = Application.objects.get(id=app_pk)
         except Application.DoesNotExist:
             return Response('Application does not exist', status=status.HTTP_400_BAD_REQUEST)
-        return Response(a.ready.status, status=status.HTTP_200_OK)
+        serializer = ApplicationWODateSerializer(a, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CloseApplicationReadyView(APIView):
@@ -93,4 +96,4 @@ class CheckApplicationView(APIView):
 class GetClosedApplicationsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = ApplicationSerializer
-    queryset = Application.objects.filter(ready__status=False)
+    queryset = Application.objects.filter(readystatus__status=False)
