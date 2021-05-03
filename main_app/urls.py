@@ -9,5 +9,7 @@ urlpatterns = [
     path('close/', CloseApplicationReadyView.as_view()),
     path('check/<int:app_pk>/', CheckApplicationView.as_view()),
     path('get/closed/', GetClosedApplicationsView.as_view()),
+    path('close/all/', CloseAllApplicationsView.as_view()),
+    path('own/list/', ListOwnApplicationView.as_view()),
 
 ]

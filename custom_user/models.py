@@ -9,6 +9,10 @@ class CustomUserManager(BaseUserManager):
         user = CustomUser(name=name)
         user.set_unusable_password()
         user.save()
+        try:
+            user.position.add(Position.objects.get(position='student'))
+        except Position.DoesNotExist:
+            pass
         return user
 
     def create_superuser(self, name, password):
@@ -32,8 +36,6 @@ class CustomUser(AbstractBaseUser):
 
     position = models.ManyToManyField(Position, blank=True)
 
-    date_joined = models.DateTimeField(auto_now_add=True)
-    last_login = models.DateTimeField(auto_now=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)

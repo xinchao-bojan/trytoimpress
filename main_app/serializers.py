@@ -24,18 +24,3 @@ class ApplicationSerializer(serializers.ModelSerializer):
     readystatus = ReadySerializer()
     owner = CustomUserSerializer()
     checkstatus_set = CheckSerializer(many=True)
-
-
-class ReadyTempSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ReadyStatus
-        fields = ['status']
-
-
-class ApplicationWODateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Application
-        fields = ['owner', 'readystatus']
-
-    owner = CustomUserSerializer()
-    readystatus = ReadyTempSerializer()

@@ -39,7 +39,7 @@ class CheckStatus(models.Model):
 
 
 class Application(models.Model):
-    owner = models.OneToOneField(User, verbose_name='Владелец заявки', on_delete=models.CASCADE, unique=True)
+    owner = models.ForeignKey(User, verbose_name='Владелец заявки', on_delete=models.CASCADE)
     start_date = models.DateField(auto_now_add=True, verbose_name='Старт подачи заявки')
 
     def __str__(self):

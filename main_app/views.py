@@ -7,27 +7,26 @@ from .serializers import *
 from custom_user.permissions import *
 
 
-class CreateApplicationView(APIView):
+class CreateApplicationView(generics.ListAPIView):
+    serializer_class = ApplicationSerializer
+    queryset = None
 
     def post(self, request):
-        try:
-            Application.objects.get(owner=request.user)
-            return Response('already exist', status=status.HTTP_400_BAD_REQUEST)
-        except Application.DoesNotExist:
-            a = Application.objects.create(owner=request.user)
-            ReadyStatus.objects.create(application=a)
-            serializer = ApplicationSerializer(a, context={'request': request})
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        ReadyStatus.objects.filter(application__owner=request.user).update(status=False, closed_date=now())
+        a = Application.objects.create(owner=request.user)
+        ReadyStatus.objects.create(application=a)
+        self.queryset = Application.objects.filter(owner=request.user).order_by('-id')
+        return super().list(request)
 
 
 class GetApplicationReadyView(APIView):
 
     def get(self, request, app_pk):
         try:
-            a = Application.objects.get(id=app_pk)
+            a = Application.objects.get(id=app_pk, owner=request.user)
         except Application.DoesNotExist:
             return Response('Application does not exist', status=status.HTTP_400_BAD_REQUEST)
-        serializer = ApplicationWODateSerializer(a, context={'request': request})
+        serializer = ApplicationSerializer(a, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -36,7 +35,7 @@ class CloseApplicationReadyView(APIView):
 
     def post(self, request):
         try:
-            a = Application.objects.get(owner=request.user)
+            a = Application.objects.filter(owner=request.user).last()
             r = a.ready
 
         except Application.DoesNotExist:
@@ -94,6 +93,25 @@ class CheckApplicationView(APIView):
 
 
 class GetClosedApplicationsView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated, IsAdmin]
+    permission_classes = [IsAdmin]
     serializer_class = ApplicationSerializer
     queryset = Application.objects.filter(readystatus__status=False)
+
+
+class CloseAllApplicationsView(APIView):
+    permission_classes = [IsAdmin]
+
+    def post(self, request):
+        ReadyStatus.objects.filter(status=True).update(status=False, closed_date=now())
+        if ReadyStatus.objects.filter(status=True):
+            return Response('lol', status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_200_OK)
+
+
+class ListOwnApplicationView(generics.ListAPIView):
+    queryset = None
+    serializer_class = ApplicationSerializer
+
+    def get(self, request):
+        self.queryset = Application.objects.filter(owner=request.user).order_by('-id')
+        return super().list(request)

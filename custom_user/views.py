@@ -1,6 +1,5 @@
 from functools import wraps
 import jwt
-from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
 from django.http import JsonResponse
@@ -50,3 +49,41 @@ def public(request):
 @api_view(['GET'])
 def private(request):
     return JsonResponse({'message': 'Hello from a private endpoint! You need to be authenticated to see this.'})
+
+
+from rest_framework.response import Response
+from rest_framework import generics, status
+from rest_framework.views import APIView
+
+from .permissions import *
+from .serializers import *
+
+
+class GivePositionView(generics.ListAPIView):
+    permission_classes = [IsAdmin]
+    queryset = None
+    serializer_class = CustomUserSerializer
+
+    def get(self, request):
+        self.queryset = CustomUser.objects.all()
+        return super().list(request)
+
+    def put(self, request):
+        try:
+            p, created = Position.objects.get_or_create(position=request.data['position'])
+            u = CustomUser.objects.get(pk=request.data['user'])
+        except KeyError:
+            return Response('KeyError', status=status.HTTP_400_BAD_REQUEST)
+        except CustomUser.DoesNotExist:
+            return Response('Custom user does not exist', status=status.HTTP_400_BAD_REQUEST)
+        u.position.add(p)
+        serializer = CustomUserSerializer(u, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class ListUserRoles(APIView):
+
+    def get(self, request):
+        serializer = PositionSerializer(Position.objects.filter(customuser=request.user), many=True,
+                                        context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)

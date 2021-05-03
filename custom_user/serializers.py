@@ -12,6 +12,6 @@ class PositionSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        exclude = ['password']
+        fields = ['position', 'name']
 
     position = PositionSerializer(many=True)
