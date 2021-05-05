@@ -7,20 +7,23 @@ from custom_user.serializers import CustomUserSerializer
 class ReadySerializer(serializers.ModelSerializer):
     class Meta:
         model = ReadyStatus
-        fields = '__all__'
+        exclude = ['application', 'id']
 
 
 class CheckSerializer(serializers.ModelSerializer):
     class Meta:
+        depth = 1
         model = CheckStatus
-        fields = '__all__'
+        exclude = ['application', 'id']
+        read_only_fields = ['judge']
+
+    judge = CustomUserSerializer()
 
 
 class ApplicationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
-        fields = ['id', 'owner', 'start_date', 'readystatus', 'checkstatus_set']
+        fields = ['id', 'start_date', 'readystatus', 'checkstatus_set']
 
     readystatus = ReadySerializer()
-    owner = CustomUserSerializer()
     checkstatus_set = CheckSerializer(many=True)

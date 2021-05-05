@@ -28,7 +28,7 @@ class CheckStatus(models.Model):
         (REVISION, 'Заявка отправлена на доработку'),
     )
 
-    judge = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
+    judge = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     status = models.CharField(choices=STATUS, max_length=8)
     check_date = models.DateTimeField(verbose_name='Дата оценки заявки')
     application = models.ForeignKey('Application', verbose_name='Статус проверки заявки', blank=True, null=True,

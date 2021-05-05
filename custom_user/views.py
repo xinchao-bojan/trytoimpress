@@ -62,7 +62,7 @@ from .serializers import *
 class GivePositionView(generics.ListAPIView):
     permission_classes = [IsAdmin]
     queryset = None
-    serializer_class = CustomUserSerializer
+    serializer_class = CustomUserPositionSerializer
 
     def get(self, request):
         self.queryset = CustomUser.objects.all()
@@ -77,11 +77,11 @@ class GivePositionView(generics.ListAPIView):
         except CustomUser.DoesNotExist:
             return Response('Custom user does not exist', status=status.HTTP_400_BAD_REQUEST)
         u.position.add(p)
-        serializer = CustomUserSerializer(u, context={'request': request})
+        serializer = CustomUserPositionSerializer(u, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class ListUserRoles(APIView):
+class ListUserRoles(generics.ListAPIView):
 
     def get(self, request):
         serializer = PositionSerializer(Position.objects.filter(customuser=request.user), many=True,

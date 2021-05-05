@@ -56,6 +56,7 @@ class CloseApplicationReadyView(APIView):
 
 class CheckApplicationView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
+    serializer_class = ApplicationSerializer
 
     def post(self, request, app_pk):
         d = {
