@@ -54,6 +54,7 @@ def private(request):
 from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.views import APIView
+from drf_yasg.utils import swagger_auto_schema
 
 from .permissions import *
 from .serializers import *
@@ -68,6 +69,21 @@ class GivePositionView(generics.ListAPIView):
         self.queryset = CustomUser.objects.all()
         return super().list(request)
 
+    '''
+    DELETE
+    '''
+
+    class body(serializers.Serializer):
+        user = serializers.IntegerField()
+        position = serializers.CharField()
+
+    @swagger_auto_schema(operation_description='giving an existing or creating role to a user ',
+                         request_body=body(),
+                         responses={
+                             '400': 'KeyError',
+                             '400': 'Custom user does not exist',
+                             '200': CustomUserPositionSerializer()
+                         })
     def put(self, request):
         try:
             p, created = Position.objects.get_or_create(position=request.data['position'])
@@ -83,6 +99,10 @@ class GivePositionView(generics.ListAPIView):
 
 class ListUserRoles(generics.ListAPIView):
 
+    @swagger_auto_schema(operation_description='returns user\'s roles',
+                         responses={
+                             '200': PositionSerializer(many=True)
+                         })
     def get(self, request):
         serializer = PositionSerializer(Position.objects.filter(customuser=request.user), many=True,
                                         context={'request': request})

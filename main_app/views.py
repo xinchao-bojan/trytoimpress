@@ -1,3 +1,4 @@
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics, status
@@ -7,20 +8,27 @@ from .serializers import *
 from custom_user.permissions import *
 
 
-class CreateApplicationView(generics.ListAPIView):
+class CreateApplicationView(APIView):
     serializer_class = ApplicationSerializer
-    queryset = None
 
+    @swagger_auto_schema(operation_description='creates new application',
+                         responses={
+                             '200': ApplicationSerializer()
+                         })
     def post(self, request):
         ReadyStatus.objects.filter(application__owner=request.user).update(status=False, closed_date=now())
         a = Application.objects.create(owner=request.user)
         ReadyStatus.objects.create(application=a)
-        self.queryset = Application.objects.filter(owner=request.user).order_by('-id')
-        return super().list(request)
+        serializer = ApplicationSerializer(a, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class GetApplicationReadyView(APIView):
-
+    @swagger_auto_schema(operation_description='Returns application by id',
+                         responses={
+                             '200': ApplicationSerializer(),
+                             '400': 'Application does not exist'
+                         })
     def get(self, request, app_pk):
         try:
             a = Application.objects.get(id=app_pk, owner=request.user)
@@ -33,6 +41,14 @@ class GetApplicationReadyView(APIView):
 class CloseApplicationReadyView(APIView):
     permission_classes = [IsAuthenticated, IsOwner]
 
+    @swagger_auto_schema(operation_description='Close last user\'s application',
+                         responses={
+                             '200': 'Заявка уже закрыта',
+                             '200': ApplicationSerializer(),
+                             '400': 'Application does not exist',
+                             '400': 'Ready status does not exist',
+                             '400': 'KeyError',
+                         })
     def post(self, request):
         try:
             a = Application.objects.filter(owner=request.user).last()
@@ -57,7 +73,23 @@ class CloseApplicationReadyView(APIView):
 class CheckApplicationView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
     serializer_class = ApplicationSerializer
+    '''
+    DELETE
+    '''
 
+    class body1(serializers.Serializer):
+        status = serializers.CharField()
+
+    @swagger_auto_schema(operation_description='Check application by id',
+                         request_body=body1(),
+                         responses={
+                             '200': 'Невозможно оценить открытую заявку',
+                             '200': ApplicationSerializer(),
+                             '400': 'Application does not exist',
+                             '400': 'Ready status does not exist',
+                             '400': 'KeyError',
+                             '400': 'Add correct status',
+                         })
     def post(self, request, app_pk):
         d = {
             'accepted': CheckStatus.ACCEPTED,
@@ -69,7 +101,7 @@ class CheckApplicationView(APIView):
             a = Application.objects.get(id=app_pk)
             r = a.ready
             if r.status:
-                return Response('Невозможно оценить открытую заявку')
+                return Response('Невозможно оценить открытую заявку', status=200)
             s = d.get(request.data['status'])
 
         except Application.DoesNotExist:
@@ -102,6 +134,11 @@ class GetClosedApplicationsView(generics.ListAPIView):
 class CloseAllApplicationsView(APIView):
     permission_classes = [IsAdmin]
 
+    @swagger_auto_schema(operation_description='Close all applications',
+                         responses={
+                             '500': 'lol',
+                             '200': '',
+                         })
     def post(self, request):
         ReadyStatus.objects.filter(status=True).update(status=False, closed_date=now())
         if ReadyStatus.objects.filter(status=True):
