@@ -107,3 +107,10 @@ class ListUserRoles(generics.ListAPIView):
         serializer = PositionSerializer(Position.objects.filter(customuser=request.user), many=True,
                                         context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UserInfo(APIView):
+
+    def get(self, request):
+        serializer = CustomUserSerializer(request.user, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -7,4 +7,5 @@ urlpatterns = [
     path('private/', views.private),
     path('addposition/', views.GivePositionView.as_view()),
     path('roles/', views.ListUserRoles.as_view()),
+    path('info/', views.UserInfo.as_view()),
 ]

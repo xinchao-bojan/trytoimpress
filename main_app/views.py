@@ -164,7 +164,7 @@ class GetIdOfLastApplicationView(APIView):
         id = serializers.IntegerField()
         status = serializers.CharField()
 
-    @swagger_auto_schema(operation_description='Get id and status of last app (for backend)',
+    @swagger_auto_schema(operation_description='Get id and status of last app',
                          responses={
                              '500': 'lol',
                              '200': body2(),
