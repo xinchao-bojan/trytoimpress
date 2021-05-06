@@ -19,7 +19,7 @@ from django.conf.urls import url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('main_app.urls')),
+    path('api/application/', include('main_app.urls')),
     path('api/users/', include('custom_user.urls')),
 ]
 from rest_framework import permissions

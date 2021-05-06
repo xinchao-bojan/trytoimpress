@@ -153,3 +153,26 @@ class ListOwnApplicationView(generics.ListAPIView):
     def get(self, request):
         self.queryset = Application.objects.filter(owner=request.user).order_by('-id')
         return super().list(request)
+
+
+class GetIdOfLastApplicationView(APIView):
+    '''
+    DELETE
+    '''
+
+    class body2(serializers.Serializer):
+        id = serializers.IntegerField()
+        status = serializers.CharField()
+
+    @swagger_auto_schema(operation_description='Get id and status of last app (for backend)',
+                         responses={
+                             '500': 'lol',
+                             '200': body2(),
+                         })
+    def get(self, request):
+        a = Application.objects.filter(owner=request.user).last()
+        data = {
+            'id': a.id,
+            'status': a.readystatus.status
+        }
+        return Response(data, status=status.HTTP_200_OK)

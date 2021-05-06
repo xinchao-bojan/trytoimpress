@@ -11,5 +11,6 @@ urlpatterns = [
     path('get/closed/', GetClosedApplicationsView.as_view()),
     path('close/all/', CloseAllApplicationsView.as_view()),
     path('own/list/', ListOwnApplicationView.as_view()),
+    path('last/', GetIdOfLastApplicationView.as_view()),
 
 ]
