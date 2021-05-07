@@ -74,7 +74,7 @@ class GivePositionView(generics.ListAPIView):
     '''
 
     class body(serializers.Serializer):
-        user = serializers.IntegerField()
+        user = serializers.CharField()
         position = serializers.CharField()
 
     @swagger_auto_schema(operation_description='giving an existing or creating role to a user ',
@@ -87,7 +87,7 @@ class GivePositionView(generics.ListAPIView):
     def put(self, request):
         try:
             p, created = Position.objects.get_or_create(position=request.data['position'])
-            u = CustomUser.objects.get(pk=request.data['user'])
+            u = CustomUser.objects.get(name=request.data['user'])
         except KeyError:
             return Response('KeyError', status=status.HTTP_400_BAD_REQUEST)
         except CustomUser.DoesNotExist:
