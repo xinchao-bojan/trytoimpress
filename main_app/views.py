@@ -13,7 +13,7 @@ class CreateApplicationView(APIView):
 
     @swagger_auto_schema(operation_description='creates new application',
                          responses={
-                             '200': ApplicationSerializer()
+                             '201': ApplicationSerializer()
                          })
     def post(self, request):
         ReadyStatus.objects.filter(application__owner=request.user).update(status=False, closed_date=now())
@@ -52,7 +52,9 @@ class CloseApplicationReadyView(APIView):
     def post(self, request):
         try:
             a = Application.objects.filter(owner=request.user).last()
-            r = a.ready
+            if not a:
+                return Response('User dont have applications', status=status.HTTP_400_BAD_REQUEST)
+            r = a.readystatus
 
         except Application.DoesNotExist:
             return Response('Application does not exist', status=status.HTTP_400_BAD_REQUEST)
@@ -99,9 +101,9 @@ class CheckApplicationView(APIView):
 
         try:
             a = Application.objects.get(id=app_pk)
-            r = a.ready
+            r = a.readystatus
             if r.status:
-                return Response('Невозможно оценить открытую заявку', status=200)
+                return Response('Невозможно оценить открытую заявку', status=400)
             s = d.get(request.data['status'])
 
         except Application.DoesNotExist:
@@ -122,7 +124,7 @@ class CheckApplicationView(APIView):
             r.status = True
             r.save()
         serializer = ApplicationSerializer(a, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GetClosedApplicationsView(generics.ListAPIView):
@@ -166,13 +168,16 @@ class GetIdOfLastApplicationView(APIView):
 
     @swagger_auto_schema(operation_description='Get id and status of last app',
                          responses={
-                             '500': 'lol',
+                             '400': 'u have no applications',
                              '200': body2(),
                          })
     def get(self, request):
         a = Application.objects.filter(owner=request.user).last()
-        data = {
-            'id': a.id,
-            'status': a.readystatus.status
-        }
+        if a:
+            data = {
+                'id': a.id,
+                'status': a.readystatus.status
+            }
+        else:
+            return Response('u have no applications', status=status.HTTP_400_BAD_REQUEST)
         return Response(data, status=status.HTTP_200_OK)

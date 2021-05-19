@@ -17,10 +17,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls import url
 
+from main_app.views import GetIdOfLastApplicationView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/application/', include('main_app.urls')),
     path('api/users/', include('custom_user.urls')),
+    path('test', GetIdOfLastApplicationView.as_view()),
 ]
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
