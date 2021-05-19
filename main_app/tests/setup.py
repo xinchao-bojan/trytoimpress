@@ -1,3 +1,5 @@
+import time
+
 from rest_framework.test import APITestCase
 import requests
 
@@ -12,24 +14,22 @@ class TestSetUp(APITestCase):
         TestSetUp.STUDENT = self.get_token(username='student@mirea.ru', password='123')
         TestSetUp.ADMIN = self.get_token(username='director@mirea.ru', password='123')
 
-        '''
-        STUDENT
-        '''
         self.client.credentials(HTTP_AUTHORIZATION=self.STUDENT)
         self.client.post('/api/application/create/')
 
-        p = Position.objects.create(position='student')
-        c = CustomUser.objects.get(id=1)
-        c.position.add(p)
-        '''
-        ADMIN
-        '''
         self.client.credentials(HTTP_AUTHORIZATION=self.ADMIN)
-        self.client.post('/api/users/public/')
+        self.client.get('/api/users/private/')
 
-        p = Position.objects.create(position='director')
+        p1 = Position.objects.create(position='student')
+        p2 = Position.objects.create(position='director')
+
+        # time.sleep(0.5)
+
+        c = CustomUser.objects.get(id=1)
+        c.position.add(p1)
+
         c = CustomUser.objects.get(id=2)
-        c.position.add(p)
+        c.position.add(p2)
         c.is_staff = True
         c.save()
 
