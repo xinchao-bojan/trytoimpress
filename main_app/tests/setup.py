@@ -29,7 +29,7 @@ class TestSetUp(APITestCase):
         c.is_staff = True
         c.save()
         self.client.credentials(HTTP_AUTHORIZATION='')
-        # return super().setUp()
+        return super().setUp()
 
     def get_token(self, username, password):
         r = requests.post('https://suroegin503.eu.auth0.com/oauth/token', data={
