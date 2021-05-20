@@ -93,6 +93,7 @@ class GivePositionView(generics.ListAPIView):
         except CustomUser.DoesNotExist:
             return Response('Custom user does not exist', status=status.HTTP_400_BAD_REQUEST)
         u.position.add(p)
+        u.save()
         serializer = CustomUserPositionSerializer(u, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 

@@ -1,11 +1,10 @@
 from django.urls import path
-
-from . import views
+from .views import *
 
 urlpatterns = [
-    path('public/', views.public),
-    path('private/', views.private),
-    path('addposition/', views.GivePositionView.as_view()),
-    path('roles/', views.ListUserRoles.as_view()),
-    path('info/', views.UserInfo.as_view()),
+    path('public/', public),
+    path('private/', private),
+    path('addposition/', GivePositionView.as_view()),
+    path('roles/', ListUserRoles.as_view()),
+    path('info/', UserInfo.as_view()),
 ]
