@@ -28,6 +28,20 @@ class Test(TestSetUp):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json(), 'Custom user does not exist')
 
+    def test_invalid_user_type(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.ADMIN)
+        response = self.client.put(self.route, {'user': True, 'position': True})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), 'Custom user does not exist')
+
+    def test_invalid_position_type(self):
+        self.client.credentials(HTTP_AUTHORIZATION=self.ADMIN)
+        response = self.client.put(self.route, {'user': 'auth0.60929d2255c45f00681ec4d1', 'position': True})
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json(), 'Custom user does not exist')
+
     def test_without_pos(self):
         self.client.credentials(HTTP_AUTHORIZATION=self.ADMIN)
         response = self.client.put(self.route, {'user': 'invalid'})
