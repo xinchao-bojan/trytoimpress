@@ -33,7 +33,6 @@ class Position(models.Model):
 
 class CustomUser(AbstractBaseUser):
     name = models.CharField(max_length=255, unique=True)
-
     position = models.ManyToManyField(Position, blank=True)
 
     is_staff = models.BooleanField(default=False)

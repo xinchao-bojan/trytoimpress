@@ -92,6 +92,8 @@ class GivePositionView(generics.ListAPIView):
             return Response('KeyError', status=status.HTTP_400_BAD_REQUEST)
         except CustomUser.DoesNotExist:
             return Response('Custom user does not exist', status=status.HTTP_400_BAD_REQUEST)
+        if p.position.startswith('director'):
+            u.is_staff = True
         u.position.add(p)
         u.save()
         serializer = CustomUserPositionSerializer(u, context={'request': request})
