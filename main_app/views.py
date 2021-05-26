@@ -13,9 +13,23 @@ class CreateApplicationView(APIView):
 
     @swagger_auto_schema(operation_description='creates new application',
                          responses={
-                             '201': ApplicationSerializer()
+                             '201': ApplicationSerializer(),
+                             '400': 'KeyError'
                          })
     def post(self, request):
+        try:
+            first_name = request.data['first_name']
+            last_name = request.data['last_name']
+            university = request.data['university']
+            group = request.data['group']
+        except KeyError:
+            return Response('KeyError', status=status.HTTP_400_BAD_REQUEST)
+        u = request.user
+        u.first_name = first_name
+        u.last_name = last_name
+        u.university = university
+        u.group = group
+        u.save()
         ReadyStatus.objects.filter(application__owner=request.user).update(status=False, closed_date=now())
         a = Application.objects.create(owner=request.user)
         ReadyStatus.objects.create(application=a)

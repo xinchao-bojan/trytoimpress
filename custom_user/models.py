@@ -35,6 +35,11 @@ class CustomUser(AbstractBaseUser):
     name = models.CharField(max_length=255, unique=True)
     position = models.ManyToManyField(Position, blank=True)
 
+    first_name = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255, blank=True)
+    university = models.CharField(max_length=255, blank=True)
+    group = models.CharField(max_length=255, blank=True)
+
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)

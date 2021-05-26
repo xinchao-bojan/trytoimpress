@@ -15,9 +15,14 @@ class TestSetUp(APITestCase):
     def setUp(self):
         TestSetUp.STUDENT = self.get_token(username='student@mirea.ru', password='123')
         TestSetUp.ADMIN = self.get_token(username='director@mirea.ru', password='123')
-
+        data = {
+            'first_name': 'Maksudbek',
+            'last_name': 'Igamberdyev',
+            'university': 'IT',
+            'group': 'IVBO-07-19'
+        }
         self.client.credentials(HTTP_AUTHORIZATION=self.STUDENT)
-        self.client.post('/api/application/create/')
+        self.client.post('/api/application/create/', data)
 
         self.client.credentials(HTTP_AUTHORIZATION=self.ADMIN)
         self.client.get('/api/users/private/')
