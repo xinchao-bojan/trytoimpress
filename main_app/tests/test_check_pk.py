@@ -1,5 +1,4 @@
 from .setup import TestSetUp
-from main_app.models import Application
 
 
 class Test(TestSetUp):

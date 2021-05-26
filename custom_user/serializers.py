@@ -12,10 +12,7 @@ class PositionSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        # fields = ['position', 'name']
-        fields = ['id', 'name']
-
-    # position = PositionSerializer(many=True)
+        fields = ['id', 'name', 'first_name', 'last_name', 'university', 'group']
 
 
 class CustomUserPositionSerializer(serializers.ModelSerializer):
